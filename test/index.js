@@ -1,34 +1,31 @@
-var fs = require('fs'),
-  path = require('path'),
-  assert = require('assert'),
-  jpeg = require('..');
+import * as t from "https://deno.land/std/testing/asserts.ts";
+import { JPEG as jpeg } from "../JPEG.js";
 
 function fixture(name) {
-  return fs.readFileSync(path.join(__dirname, 'fixtures', name));
+  return Deno.readFileSync('fixtures/' + name);
 }
 
-const SUPER_LARGE_JPEG_BASE64 =
-  '/9j/wJ39sP//DlKWvX+7xPlXkJa9f7v8DoDVAAD//zb6QAEAI2cBv3P/r4ADpX8Jf14AAAAAgCPE+VeQlr1/uwCAAAAVALNOjAGP2lIS';
+//const SUPER_LARGE_JPEG_BASE64 = '/9j/wJ39sP//DlKWvX+7xPlXkJa9f7v8DoDVAAD//zb6QAEAI2cBv3P/r4ADpX8Jf14AAAAAgCPE+VeQlr1/uwCAAAAVALNOjAGP2lIS';
 
-const SUPER_LARGE_JPEG_BUFFER = Buffer.from(SUPER_LARGE_JPEG_BASE64, 'base64');
+//const SUPER_LARGE_JPEG_BUFFER = Buffer.from(SUPER_LARGE_JPEG_BASE64, 'base64');
 
-it('should be able read image with a bad e1 marker not preceeded by ff', function () {
+Deno.test('should be able read image with a bad e1 marker not preceeded by ff', function () {
     var jpegData = fixture('table-with-bad-e1.jpg');
     var rawImageData = jpeg.decode(jpegData);
     var expected = fixture('table-with-good-e1.jpg');
     var rawExpectedImageData = jpeg.decode(expected);
-    expect(rawImageData.data).toEqual(rawExpectedImageData.data);
+    t.assertEquals(rawImageData.data, rawExpectedImageData.data);
 });
 
-it('should be able to decode a JPEG', function () {
+Deno.test('should be able to decode a JPEG', function () {
   var jpegData = fixture('grumpycat.jpg');
   var rawImageData = jpeg.decode(jpegData);
-  expect(rawImageData.width).toEqual(320);
-  expect(rawImageData.height).toEqual(180);
+  t.assertEquals(rawImageData.width, 320);
+  t.assertEquals(rawImageData.height, 180);
   var expected = fixture('grumpycat.rgba');
-  expect(rawImageData.data).toEqual(expected);
+  t.assertEquals(rawImageData.data, expected);
 });
-
+/*
 it('should be able to decode a JPEG with fill bytes', function () {
   var jpegData = fixture('fillbytes.jpg');
   var rawImageData = jpeg.decode(jpegData);
@@ -141,8 +138,8 @@ it('should be able to decode a progressive JPEG the same as non-progressive', fu
   expect(rawImageData.height).toEqual(otherRawImageData.height);
   expect(rawImageData.data).toEqual(otherRawImageData.data);
 });
-
-it('should be able to encode a JPEG', function () {
+*/
+Deno.test('should be able to encode a JPEG', function () {
   var frameData = fixture('grumpycat.rgba');
   var rawImageData = {
     data: frameData,
@@ -150,12 +147,12 @@ it('should be able to encode a JPEG', function () {
     height: 180,
   };
   var jpegImageData = jpeg.encode(rawImageData, 50);
-  expect(jpegImageData.width).toEqual(320);
-  expect(jpegImageData.height).toEqual(180);
+  t.assertEquals(jpegImageData.width, 320);
+  t.assertEquals(jpegImageData.height, 180);
   var expected = fixture('grumpycat-50.jpg');
-  expect(jpegImageData.data).toEqual(expected);
+  t.assertEquals(jpegImageData.data, expected);
 });
-
+/*
 it('should be able to create a JPEG from an array', function () {
   var width = 320,
     height = 180;
@@ -288,3 +285,4 @@ it('should limit memory exposure', function () {
   var jpegData = fixture('grumpycat.jpg');
   expect(() => jpeg.decode(jpegData)).not.toThrow();
 }, 30000);
+*/
