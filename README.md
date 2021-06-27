@@ -1,49 +1,25 @@
 # jpeg-js
 
-A pure javascript JPEG encoder and decoder for node.js
+A pure javascript JPEG encoder and decoder for Deno
 
 **NOTE:** this is a _synchronous_ (i.e. CPU-blocking) library that is much slower than native alternatives. If you don't need a _pure javascript_ implementation, consider using async alternatives like [sharp](http://npmjs.com/package/sharp) in node or the [Canvas API](https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API) in the browser.
-
-[![build status](https://secure.travis-ci.org/eugeneware/jpeg-js.png)](http://travis-ci.org/eugeneware/jpeg-js)
-
-## Installation
-
-This module is installed via npm:
-
-```bash
-$ npm install jpeg-js
-```
 
 ## Example Usage
 
 ### Decoding JPEGs
 
-Will decode a buffer or typed array into a `Buffer`;
+Will decode typed array into a `Uint8Array`;
 
 ```js
-var jpeg = require('jpeg-js');
-var jpegData = fs.readFileSync('grumpycat.jpg');
-var rawImageData = jpeg.decode(jpegData);
+import { JPEG } from "https://taisukef.github.io/jpeg-js-es/JPEG.js";
+
+const jpegData = Deno.readFileSync('grumpycat.jpg');
+const rawImageData = JPEG.decode(jpegData);
 console.log(rawImageData);
 /*
 { width: 320,
   height: 180,
-  data: <Buffer 5b 40 29 ff 59 3e 29 ff 54 3c 26 ff 55 3a 27 ff 5a 3e 2f ff 5c 3c 31 ff 58 35 2d ff 5b 36 2f ff 55 35 32 ff 5a 3a 37 ff 54 36 32 ff 4b 32 2c ff 4b 36 ... > }
-*/
-```
-
-To decode directly into a `Uint8Array`, pass `useTArray: true` in options
-`decode`:
-
-```js
-var jpeg = require('jpeg-js');
-var jpegData = fs.readFileSync('grumpycat.jpg');
-var rawImageData = jpeg.decode(jpegData, {useTArray: true}); // return as Uint8Array
-console.log(rawImageData);
-/*
-{ width: 320,
-  height: 180,
-  data: { '0': 91, '1': 64, ... } } // typed array
+  data: <Uint8Array 5b 40 29 ff 59 3e 29 ff 54 3c 26 ff 55 3a 27 ff 5a 3e 2f ff 5c 3c 31 ff 58 35 2d ff 5b 36 2f ff 55 35 32 ff 5a 3a 37 ff 54 36 32 ff 4b 32 2c ff 4b 36 ... > }
 */
 ```
 
@@ -52,7 +28,7 @@ console.log(rawImageData);
 | Option               | Description                                                                                                                                                                                       | Default     |
 | -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- |
 | `colorTransform`     | Transform alternate colorspaces like YCbCr. `undefined` means respect the default behavior encoded in metadata.                                                                                   | `undefined` |
-| `useTArray`          | Decode pixels into a typed `Uint8Array` instead of a `Buffer`.                                                                                                                                    | `false`     |
+| `useTArray`          | Decode pixels into a typed `Uint8Array` instead of a `Buffer`.                                                                                                                                    | `true`     |
 | `formatAsRGBA`       | Decode pixels into RGBA vs. RGB.                                                                                                                                                                  | `true`      |
 | `tolerantDecoding`   | Be more tolerant when encountering technically invalid JPEGs.                                                                                                                                     | `true`      |
 | `maxResolutionInMP`  | The maximum resolution image that `jpeg-js` should attempt to decode in megapixels. Images larger than this resolution will throw an error instead of decoding.                                   | `100`       |
@@ -61,31 +37,43 @@ console.log(rawImageData);
 ### Encoding JPEGs
 
 ```js
-var jpeg = require('jpeg-js');
-var width = 320,
-  height = 180;
-var frameData = new Buffer(width * height * 4);
-var i = 0;
+import { JPEG } from "https://taisukef.github.io/jpeg-js-es/JPEG.js";
+
+const width = 320;
+const height = 180;
+const frameData = new Uint8Array(width * height * 4);
+let i = 0;
 while (i < frameData.length) {
   frameData[i++] = 0xff; // red
   frameData[i++] = 0x00; // green
   frameData[i++] = 0x00; // blue
   frameData[i++] = 0xff; // alpha - ignored in JPEGs
 }
-var rawImageData = {
+const rawImageData = {
   data: frameData,
   width: width,
   height: height,
 };
-var jpegImageData = jpeg.encode(rawImageData, 50);
+const jpegImageData = JPEG.encode(rawImageData, 50);
 console.log(jpegImageData);
 /*
-{ width: 320,
-  height: 180,
-  data: <Buffer 5b 40 29 ff 59 3e 29 ff 54 3c 26 ff 55 3a 27 ff 5a 3e 2f ff 5c 3c 31 ff 58 35 2d ff 5b 36 2f ff 55 35 32 ff 5a 3a 37 ff 54 36 32 ff 4b 32 2c ff 4b 36 ... > }
+{
+  data: Uint8Array(2224) [
+    255, 216, 255, 224,  0,  16,  74,  70,  73,  70,   0,   1,   1,  0,  0,
+      1,   0,   1,   0,  0, 255, 219,   0, 132,   0,  16,  11,  12, 14, 12,
+     10,  16,  14,  13, 14,  18,  17,  16,  19,  24,  40,  26,  24, 22, 22,
+     24,  49,  35,  37, 29,  40,  58,  51,  61,  60,  57,  51,  56, 55, 64,
+     72,  92,  78,  64, 68,  87,  69,  55,  56,  80, 109,  81,  87, 95, 98,
+    103, 104, 103,  62, 77, 113, 121, 112, 100, 120,  92, 101, 103, 99,  1,
+     17,  18,  18,  24, 21,  24,  47,  26,  26,  47,
+    ... 2124 more items
+  ],
+  width: 320,
+  height: 180
+}
 */
 // write to file
-fs.writeFileSync('image.jpg', jpegImageData.data);
+Deno.writeFileSync('image.jpg', jpegImageData.data);
 ```
 
 ## License
@@ -114,7 +102,7 @@ limitations under the License.
 
 The encoding is based off a port of the JPEG encoder in [as3corelib](https://code.google.com/p/as3corelib/source/browse/trunk/src/com/adobe/images/JPGEncoder.as).
 
-The port to Javascript was done by by Andreas Ritter, www.bytestrom.eu, 11/2009.
+The port to JavaScript was done by by Andreas Ritter, www.bytestrom.eu, 11/2009.
 
 The Adobe License for the encoder is:
 
