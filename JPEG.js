@@ -1,5 +1,7 @@
-import { encode } from "./lib/encoder.js";
+import { encode as _encode } from "./lib/encoder.js";
 import { decode } from "./lib/decoder.js";
 
-const JPEG = { encode, decode };
-export { JPEG };
+export const JPEG = {
+  encode: (imgd, q) => _encode(imgd, q).data,
+  decode,
+};
