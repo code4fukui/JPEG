@@ -11,7 +11,7 @@ A pure javascript JPEG encoder and decoder for Deno
 Will decode typed array into a `Uint8Array`;
 
 ```js
-import { JPEG } from "https://taisukef.github.io/jpeg-js-es/JPEG.js";
+import { JPEG } from "https://code4fukui.github.io/JPEG/JPEG.js";
 
 const jpegData = Deno.readFileSync('grumpycat.jpg');
 const rawImageData = JPEG.decode(jpegData);
@@ -37,7 +37,7 @@ console.log(rawImageData);
 ### Encoding JPEGs
 
 ```js
-import { JPEG } from "https://taisukef.github.io/jpeg-js-es/JPEG.js";
+import { JPEG } from "https://code4fukui.github.io/JPEG/JPEG.js";
 
 const width = 320;
 const height = 180;
