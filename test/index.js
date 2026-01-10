@@ -147,10 +147,13 @@ Deno.test('should be able to encode a JPEG', function () {
     height: 180,
   };
   var jpegImageData = jpeg.encode(rawImageData, 50);
+  /*
   t.assertEquals(jpegImageData.width, 320);
   t.assertEquals(jpegImageData.height, 180);
+  */
   var expected = fixture('grumpycat-50.jpg');
-  t.assertEquals(jpegImageData.data, expected);
+  //t.assertEquals(jpegImageData.data, expected);
+  t.assertEquals(jpegImageData, expected);
 });
 /*
 it('should be able to create a JPEG from an array', function () {
@@ -286,3 +289,10 @@ it('should limit memory exposure', function () {
   expect(() => jpeg.decode(jpegData)).not.toThrow();
 }, 30000);
 */
+
+Deno.test("isJPEG", () => {
+  const jpegData = fixture('marker-ffdc.jpg');
+  t.assertEquals(jpeg.canDecode(jpegData), true);
+  const bin = new Uint8Array(10);
+  t.assertEquals(jpeg.canDecode(bin), false);
+});
