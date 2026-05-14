@@ -4,3 +4,6 @@ node_modules/
 npm-debug.log
 .idea*
 .vscode*
+
+# meta-ops cleanup
+Thumbs.db
